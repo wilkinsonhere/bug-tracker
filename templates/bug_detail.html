@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+
+{% block title %}Ошибка #{{ bug.ticket_number }}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto mt-12 fade-in">
+    <h2 class="text-3xl font-bold tracking-tight mb-6 text-white">{{ bug.title }} (№ {{ bug.ticket_number }})</h2>
+    <div class="glass p-5 rounded-xl">
+        <p class="text-gray-400 text-sm">Сообщил {{ bug.username }} 
+            <span class="role-banner 
+                {% if bug.role == 'Игрок' %}role-player{% endif %}
+                {% if bug.role == 'Разработчик' %}role-developer{% endif %}
+                {% if bug.role == 'Агент поддержки' %}role-support{% endif %}
+                {% if bug.role == 'Админ' %}role-admin{% endif %}"
+            >{{ bug.role }}</span> {{ bug.created_at.strftime('%Y-%m-%d %H:%M') }}
+        </p>
+        <p class="text-gray-300 mt-3"><strong>Описание:</strong> {{ bug.description }}</p>
+        <p class="text-gray-300 mt-3"><strong>Шаги для воспроизведения:</strong> {{ bug.steps }}</p>
+        {% if last_updated_user %}
+            <p class="text-gray-400 text-sm mt-3"><strong>Последнее изменение:</strong> {{ bug.last_updated_at.strftime('%Y-%m-%d %H:%M') }} пользователем {{ last_updated_user.username }} 
+                <span class="role-banner 
+                    {% if last_updated_user.role == 'Игрок' %}role-player{% endif %}
+                    {% if last_updated_user.role == 'Разработчик' %}role-developer{% endif %}
+                    {% if last_updated_user.role == 'Агент поддержки' %}role-support{% endif %}
+                    {% if last_updated_user.role == 'Админ' %}role-admin{% endif %}"
+                >{{ last_updated_user.role }}</span>
+            </p>
+            {% if last_updated_user.role == 'Разработчик' %}
+                <span class="inline-block mt-2 px-3 py-1 gradient-button rounded-full text-sm text-white hover-scale">Получен ответ разработчика</span>
+            {% elif last_updated_user.role == 'Агент поддержки' %}
+                <span class="inline-block mt-2 px-3 py-1 gradient-button rounded-full text-sm text-white hover-scale">Получен ответ от поддержки</span>
+            {% endif %}
+        {% endif %}
+        
+        {% if current_user.is_admin %}
+            <form method="POST" class="mt-5">
+                <label for="status" class="block text-sm font-medium text-gray-300">Обновить статус</label>
+                <select id="status" name="status" class="mt-2 w-full p-3 glass rounded-xl text-white focus:ring-blue-500 focus:border-blue-500 transition">
+                    <option value="Открыт" {% if bug.status == 'Открыт' %}selected{% endif %}>Открыт</option>
+                    <option value="В работе" {% if bug.status == 'В работе' %}selected{% endif %}>В работе</option>
+                    <option value="Исправлен" {% if bug.status == 'Исправлен' %}selected{% endif %}>Исправлен</option>
+                    <option value="Закрыт" {% if bug.status == 'Закрыт' %}selected{% endif %}>Закрыт</option>
+                </select>
+                <button type="submit" class="mt-3 gradient-button text-white px-4 py-2 rounded-xl hover-scale">Обновить статус</button>
+            </form>
+            <form method="POST" action="{{ url_for('update_bug') }}" class="mt-5">
+                <input type="hidden" name="bug_id" value="{{ bug.id }}">
+                <label for="priority" class="block text-sm font-medium text-gray-300">Обновить приоритет</label>
+                <select id="priority" name="priority" class="mt-2 w-full p-3 glass rounded-xl text-white focus:ring-blue-500 focus:border-blue-500 transition">
+                    <option value="Низкий" {% if bug.priority == 'Низкий' %}selected{% endif %}>Низкий</option>
+                    <option value="Средний" {% if bug.priority == 'Средний' %}selected{% endif %}>Средний</option>
+                    <option value="Высокий" {% if bug.priority == 'Высокий' %}selected{% endif %}>Высокий</option>
+                </select>
+                <label for="category" class="block text-sm font-medium text-gray-300 mt-3">Обновить категорию</label>
+                <select id="category" name="category" class="mt-2 w-full p-3 glass rounded-xl text-white focus:ring-blue-500 focus:border-blue-500 transition">
+                    <option value="Общее" {% if bug.category == 'Общее' %}selected{% endif %}>Общее</option>
+                    <option value="UI" {% if bug.category == 'UI' %}selected{% endif %}>UI</option>
+                    <option value="Backend" {% if bug.category == 'Backend' %}selected{% endif %}>Backend</option>
+                    <option value="API" {% if bug.category == 'API' %}selected{% endif %}>API</option>
+                </select>
+                <button type="submit" class="mt-3 gradient-button text-white px-4 py-2 rounded-xl hover-scale">Обновить приоритет/категорию</button>
+            </form>
+        {% endif %}
+    </div>
+
+    <h3 class="text-2xl font-bold tracking-tight mt-8 mb-5 text-white">Комментарии</h3>
+    <div class="space-y-5">
+        {% for comment in comments %}
+            <div class="glass p-4 rounded-xl fade-in">
+                <p class="text-gray-400 text-sm">{{ comment.username }} 
+                    <span class="role-banner 
+                        {% if comment.role == 'Игрок' %}role-player{% endif %}
+                        {% if comment.role == 'Разработчик' %}role-developer{% endif %}
+                        {% if comment.role == 'Агент поддержки' %}role-support{% endif %}
+                        {% if comment.role == 'Админ' %}role-admin{% endif %}"
+                    >{{ comment.role }}</span> {{ comment.created_at.strftime('%Y-%m-%d %H:%M') }}
+                </p>
+                <p class="text-gray-300 mt-2">{{ comment.content }}</p>
+                {% if current_user.is_admin %}
+                    <div class="mt-2 flex space-x-3">
+                        <form method="POST" action="{{ url_for('bug_detail', bug_id=bug.id) }}" class="inline-block">
+                            <input type="hidden" name="edit_comment_id" value="{{ comment.id }}">
+                            <textarea name="edit_content" class="hidden mt-2 w-full p-3 glass rounded-xl text-white focus:ring-blue-500 focus:border-blue-500 transition" rows="2">{{ comment.content }}</textarea>
+                            <button type="button" class="edit-btn text-gray-400 hover:text-blue-400 focus:outline-none" data-comment-id="{{ comment.id }}">
+                                <i class="fas fa-pencil-alt"></i>
+                            </button>
+                        </form>
+                        <form method="POST" action="{{ url_for('bug_detail', bug_id=bug.id) }}" class="inline-block">
+                            <input type="hidden" name="delete_comment_id" value="{{ comment.id }}">
+                            <button type="submit" class="text-gray-400 hover:text-red-500 focus:outline-none">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </form>
+                    </div>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+
+    <form method="POST" action="{{ url_for('bug_detail', bug_id=bug.id) }}" class="mt-8">
+        <label for="comment" class="block text-sm font-medium text-gray-300">Добавить комментарий</label>
+        <textarea id="comment" name="comment" rows="4" class="mt-2 w-full p-3 glass rounded-xl focus:ring-blue-500 focus:border-blue-500 text-white transition" required></textarea>
+        <button type="submit" class="mt-3 gradient-button text-white px-4 py-2 rounded-xl hover-scale">Добавить комментарий</button>
+    </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const editButtons = document.querySelectorAll('.edit-btn');
+    editButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const commentId = this.getAttribute('data-comment-id');
+            const form = this.closest('form');
+            const textarea = form.querySelector('textarea');
+            const isEditing = textarea.classList.contains('hidden');
+
+            if (isEditing) {
+                textarea.classList.remove('hidden');
+                this.innerHTML = '<i class="fas fa-save"></i>';
+            } else {
+                form.submit();
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

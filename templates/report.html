@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}Сообщить об ошибке{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto mt-12 fade-in">
+    <h2 class="text-4xl font-bold tracking-tight mb-8">Сообщить об ошибке</h2>
+    <form method="POST" class="space-y-6">
+        <div>
+            <label for="title" class="block text-sm font-medium text-gray-300">Название ошибки</label>
+            <input type="text" id="title" name="title" class="mt-2 w-full p-4 glass rounded-xl focus:ring-blue-500 focus:border-blue-500 text-white transition" required>
+        </div>
+        <div>
+            <label for="description" class="block text-sm font-medium text-gray-300">Описание</label>
+            <textarea id="description" name="description" rows="4" class="mt-2 w-full p-4 glass rounded-xl focus:ring-blue-500 focus:border-blue-500 text-white transition" required></textarea>
+        </div>
+        <div>
+            <label for="steps" class="block text-sm font-medium text-gray-300">Шаги для воспроизведения</label>
+            <textarea id="steps" name="steps" rows="4" class="mt-2 w-full p-4 glass rounded-xl focus:ring-blue-500 focus:border-blue-500 text-white transition" required></textarea>
+        </div>
+        <div>
+            <label for="priority" class="block text-sm font-medium text-gray-300">Приоритет</label>
+            <select id="priority" name="priority" class="mt-2 w-full p-4 glass rounded-xl focus:ring-blue-500 focus:border-blue-500 text-white transition" required>
+                <option value="Низкий">Низкий</option>
+                <option value="Средний" selected>Средний</option>
+                <option value="Высокий">Высокий</option>
+            </select>
+        </div>
+        <div>
+            <label for="category" class="block text-sm font-medium text-gray-300">Категория</label>
+            <select id="category" name="category" class="mt-2 w-full p-4 glass rounded-xl focus:ring-blue-500 focus:border-blue-500 text-white transition" required>
+                <option value="Общее">Общее</option>
+                <option value="UI">UI</option>
+                <option value="Backend">Backend</option>
+                <option value="API">API</option>
+            </select>
+        </div>
+        <button type="submit" class="w-full gradient-button text-white p-4 rounded-xl hover-scale">Отправить сообщение об ошибке</button>
+    </form>
+</div>
+{% endblock %}

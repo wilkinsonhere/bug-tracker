@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block title %}Все ошибки{% endblock %}
+
+{% block content %}
+<div class="mt-12 fade-in">
+    <h2 class="text-3xl font-bold tracking-tight mb-6 text-white">Все сообщения об ошибках</h2>
+    <div class="mb-6 glass p-4 rounded-xl">
+        <form method="GET" class="space-y-4">
+            <div class="flex flex-wrap gap-4">
+                <input type="text" name="search" placeholder="Поиск по номеру, названию или описанию" value="{{ search }}" class="p-2 glass rounded-xl text-white w-full sm:w-1/3">
+                <select name="status" class="p-2 glass rounded-xl text-white w-full sm:w-1/4">
+                    <option value="">Все статусы</option>
+                    <option value="Открыт" {% if status == 'Открыт' %}selected{% endif %}>Открыт</option>
+                    <option value="В работе" {% if status == 'В работе' %}selected{% endif %}>В работе</option>
+                    <option value="Исправлен" {% if status == 'Исправлен' %}selected{% endif %}>Исправлен</option>
+                    <option value="Закрыт" {% if status == 'Закрыт' %}selected{% endif %}>Закрыт</option>
+                </select>
+                <select name="role" class="p-2 glass rounded-xl text-white w-full sm:w-1/4">
+                    <option value="">Все роли</option>
+                    <option value="Игрок" {% if role == 'Игрок' %}selected{% endif %}>Игрок</option>
+                    <option value="Разработчик" {% if role == 'Разработчик' %}selected{% endif %}>Разработчик</option>
+                    <option value="Агент поддержки" {% if role == 'Агент поддержки' %}selected{% endif %}>Агент поддержки</option>
+                    <option value="Админ" {% if role == 'Админ' %}selected{% endif %}>Админ</option>
+                </select>
+                <input type="date" name="date_from" value="{{ date_from }}" class="p-2 glass rounded-xl text-white w-full sm:w-1/6">
+                <input type="date" name="date_to" value="{{ date_to }}" class="p-2 glass rounded-xl text-white w-full sm:w-1/6">
+                <button type="submit" class="gradient-button text-white p-2 rounded-xl hover-scale w-full sm:w-auto">Фильтровать</button>
+            </div>
+        </form>
+    </div>
+    <div class="space-y-5">
+        {% for bug in bugs %}
+            <div class="glass p-4 rounded-xl hover:bg-gray-900/20 transition fade-in">
+                <h3 class="text-lg font-semibold"><a href="{{ url_for('bug_detail', bug_id=bug.id) }}" class="text-blue-400 hover:text-blue-300 transition">{{ bug.title }}</a></h3>
+                <p class="text-gray-500 text-sm mt-1">№ {{ bug.ticket_number }} | Сообщил {{ bug.username }} 
+                    <span class="role-banner 
+                        {% if bug.role == 'Игрок' %}role-player{% endif %}
+                        {% if bug.role == 'Разработчик' %}role-developer{% endif %}
+                        {% if bug.role == 'Агент поддержки' %}role-support{% endif %}
+                        {% if bug.role == 'Админ' %}role-admin{% endif %}"
+                    >{{ bug.role }}</span> {{ bug.created_at.strftime('%Y-%m-%d %H:%M') }}
+                </p>
+                <div class="mt-2 space-x-2">
+                    <span class="role-banner 
+                        {% if bug.priority == 'Низкий' %}priority-low{% endif %}
+                        {% if bug.priority == 'Средний' %}priority-medium{% endif %}
+                        {% if bug.priority == 'Высокий' %}priority-high{% endif %}"
+                    >{{ bug.priority }}</span>
+                    <span class="role-banner 
+                        {% if bug.category == 'Общее' %}category-general{% endif %}
+                        {% if bug.category == 'UI' %}category-ui{% endif %}
+                        {% if bug.category == 'Backend' %}category-backend{% endif %}
+                        {% if bug.category == 'API' %}category-api{% endif %}"
+                    >{{ bug.category }}</span>
+                    <span class="role-banner 
+                        {% if bug.status == 'Открыт' %}status-open{% endif %}
+                        {% if bug.status == 'В работе' %}status-in-progress{% endif %}
+                        {% if bug.status == 'Исправлен' %}status-fixed{% endif %}
+                        {% if bug.status == 'Закрыт' %}status-closed{% endif %}"
+                    >{{ bug.status }}</span>
+                </div>
+                <p class="text-gray-400 mt-2">{{ bug.description | truncate(80) }}</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

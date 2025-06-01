@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}Главная{% endblock %}
+
+{% block content %}
+<div class="text-center py-24 fade-in">
+    <h1 class="text-5xl md:text-6xl font-bold tracking-tight mb-6">Добро пожаловать в Баг-трекер</h1>
+    <p class="text-xl md:text-2xl text-gray-400 mb-10 max-w-2xl mx-auto">Сообщайте и отслеживайте ошибки в программном обеспечении с удобным интерфейсом.</p>
+    {% if current_user.is_authenticated %}
+        <a href="{{ url_for('report') }}" class="inline-block gradient-button text-white px-8 py-4 rounded-xl hover-scale">Сообщить об ошибке</a>
+    {% else %}
+        <a href="{{ url_for('login') }}" class="inline-block gradient-button text-white px-8 py-4 rounded-xl hover-scale">Начать</a>
+    {% endif %}
+</div>
+{% endblock %}

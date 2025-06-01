@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}Админ-панель{% endblock %}
+
+{% block content %}
+<div class="mt-12 fade-in">
+    <h2 class="text-4xl font-bold tracking-tight mb-8">Админ-панель</h2>
+    <h3 class="text-2xl font-bold tracking-tight mb-6">Управление пользователями</h3>
+    <div class="space-y-4 mb-10">
+        {% for user in users %}
+            <div class="glass p-4 rounded-xl">
+                <p class="text-gray-300">{{ user.username }} 
+                    <span class="role-banner 
+                        {% if user.role == 'Игрок' %}role-player{% endif %}
+                        {% if user.role == 'Разработчик' %}role-developer{% endif %}
+                        {% if user.role == 'Агент поддержки' %}role-support{% endif %}
+                        {% if user.role == 'Админ' %}role-admin{% endif %}"
+                    >{{ user.role }}</span>
+                </p>
+                <form method="POST" class="mt-2">
+                    <input type="hidden" name="user_id" value="{{ user.id }}">
+                    <select name="role" class="p-2 glass rounded-xl text-white">
+                        <option value="Игрок" {% if user.role == 'Игрок' %}selected{% endif %}>Игрок</option>
+                        <option value="Разработчик" {% if user.role == 'Разработчик' %}selected{% endif %}>Разработчик</option>
+                        <option value="Агент поддержки" {% if user.role == 'Агент поддержки' %}selected{% endif %}>Агент поддержки</option>
+                    </select>
+                    <button type="submit" class="ml-2 gradient-button text-white px-4 py-2 rounded-xl hover-scale">Обновить роль</button>
+                </form>
+            </div>
+        {% endfor %}
+    </div>
+    <h3 class="text-2xl font-bold tracking-tight mb-6">Все сообщения об ошибках</h3>
+    <div class="space-y-6">
+        {% for bug in bugs %}
+            <div class="glass p-6 rounded-xl hover:bg-gray-900/10 transition fade-in">
+                <h3 class="text-xl font-semibold"><a href="{{ url_for('bug_detail', bug_id=bug.id) }}" class="hover:text-blue-400 transition">{{ bug.title }}</a></h3>
+                <p class="text-gray-400 text-sm mt-2">№ {{ bug.ticket_number }} | Сообщил {{ bug.username }} 
+                    <span class="role-banner 
+                        {% if bug.role == 'Игрок' %}role-player{% endif %}
+                        {% if bug.role == 'Разработчик' %}role-developer{% endif %}
+                        {% if bug.role == 'Агент поддержки' %}role-support{% endif %}
+                        {% if bug.role == 'Админ' %}role-admin{% endif %}"
+                    >{{ bug.role }}</span> {{ bug.created_at.strftime('%Y-%m-%d %H:%M') }}
+                </p>
+                <p class="text-gray-300 mt-2">Приоритет: {{ bug.priority }} | Категория: {{ bug.category }}</p>
+                <p class="text-gray-300 mt-3">{{ bug.description | truncate(100) }}</p>
+                <span class="inline-block mt-3 px-4 py-1 bg-gray-800 rounded-full text-sm text-gray-300">{{ bug.status }}</span>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

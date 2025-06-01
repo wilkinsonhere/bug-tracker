@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}Регистрация{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto mt-12 fade-in">
+    <h2 class="text-4xl font-bold tracking-tight mb-8">Регистрация</h2>
+    <form method="POST" class="space-y-6">
+        <div>
+            <label for="username" class="block text-sm font-medium text-gray-300">Имя пользователя</label>
+            <input type="text" id="username" name="username" class="mt-2 w-full p-4 glass rounded-xl focus:ring-blue-500 focus:border-blue-500 text-white transition" required>
+        </div>
+        <div>
+            <label for="password" class="block text-sm font-medium text-gray-300">Пароль</label>
+            <input type="password" id="password" name="password" class="mt-2 w-full p-4 glass rounded-xl focus:ring-blue-500 focus:border-blue-500 text-white transition" required>
+        </div>
+        <button type="submit" class="w-full gradient-button text-white p-4 rounded-xl hover-scale">Зарегистрироваться</button>
+    </form>
+    <p class="mt-6 text-center text-gray-400">Уже есть аккаунт? <a href="{{ url_for('login') }}" class="text-blue-400 hover:text-blue-300 transition">Войти</a></p>
+</div>
+{% endblock %}
